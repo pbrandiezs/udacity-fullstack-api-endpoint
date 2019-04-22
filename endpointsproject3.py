@@ -22,6 +22,8 @@ app = Flask(__name__)
 @app.route("/")
 @app.route("/puppies", methods = ['GET', 'POST'])
 def puppiesFunction():
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   if request.method == 'GET':
     #Call the method to Get all of the puppies
     return getAllPuppies()
@@ -41,6 +43,8 @@ def puppiesFunction():
 @app.route("/puppies/<int:id>", methods = ['GET', 'PUT', 'DELETE'])
 #Call the method to view a specific puppy
 def puppiesFunctionId(id):
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   if request.method == 'GET':
     return getPuppy(id)
     
@@ -55,20 +59,28 @@ def puppiesFunctionId(id):
     return deletePuppy(id)
 
 def getAllPuppies():
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   puppies = session.query(Puppy).all()
   return jsonify(Puppies=[i.serialize for i in puppies])
 
 def getPuppy(id):
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   puppy = session.query(Puppy).filter_by(id = id).one()
   return jsonify(puppy=puppy.serialize) 
   
 def makeANewPuppy(name,description):
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   puppy = Puppy(name = name, description = description)
   session.add(puppy)
   session.commit()
   return jsonify(Puppy=puppy.serialize)
 
 def updatePuppy(id,name, description):
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   puppy = session.query(Puppy).filter_by(id = id).one()
   if not name:
     puppy.name = name
@@ -79,6 +91,8 @@ def updatePuppy(id,name, description):
   return "Updated a Puppy with id %s" % id
 
 def deletePuppy(id):
+  DBSession = sessionmaker(bind=engine)
+  session = DBSession()
   puppy = session.query(Puppy).filter_by(id = id).one()
   session.delete(puppy)
   session.commit()
